@@ -45,7 +45,11 @@ const IDLE: ExecutorStatus = {
 export default function Home() {
   const { snapshot, state: wsState } = useLive();
   const status = snapshot?.status ?? IDLE;
-  const running = status.status === "RUNNING" || status.status === "DETECTING" || status.status === "ERROR";
+  const serverRunning =
+    status.status === "RUNNING" || status.status === "DETECTING" || status.status === "ERROR";
+  // the WebSocket pushes every few seconds; until it confirms, treat a successful /start as running
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const running = serverRunning || startedAt !== null;
 
   const [symbolInput, setSymbolInput] = useState(DEFAULT_SYMBOL);
   const [symbol, setSymbol] = useState(DEFAULT_SYMBOL);
@@ -67,6 +71,16 @@ export default function Home() {
       setSymbolInput(status.symbol);
     }
   }, [running, status.symbol, symbol]);
+
+  useEffect(() => {
+    if (startedAt === null) return;
+    if (serverRunning) {
+      setStartedAt(null);
+      return;
+    }
+    const t = setTimeout(() => setStartedAt(null), 15_000);
+    return () => clearTimeout(t);
+  }, [serverRunning, startedAt]);
 
   const load = useCallback(async (sym: string, quiet = false) => {
     if (!quiet) setLoading(true);
@@ -133,6 +147,7 @@ export default function Home() {
         mode,
         ...(mode === "LIVE" ? { security_id: securityId.trim(), confirm_live: true } : {}),
       });
+      setStartedAt(Date.now());
       toast.success(`Miren started on ${sym} (${mode})`);
     } catch (err) {
       toast.error(errorMessage(err));
@@ -145,6 +160,7 @@ export default function Home() {
     setBusy(true);
     try {
       await api.stop();
+      setStartedAt(null);
       toast.success("Miren stopped");
     } catch (err) {
       toast.error(errorMessage(err));
