@@ -152,12 +152,16 @@ To try LIVE without real money, use Dhan's sandbox: create keys at [developer.dh
 
 ## Deployment
 
+**Why the backend cannot run on Vercel.** Vercel runs Python as short-lived serverless functions. Miren's backend needs three things that model does not offer: a background loop that keeps running every 5 minutes, a WebSocket (`/ws/live`), and executor state held in memory between requests. Vercel's Hobby cron also fires at most once a day. So the frontend goes on Vercel and the backend goes on a host that runs a long-lived process (Render, Railway, Fly.io or any VPS).
+
+Deploy the backend **without** `DHAN_CLIENT_ID` / `DHAN_ACCESS_TOKEN` unless you mean to trade. The API has no login, so anyone who can reach a backend that holds Dhan credentials can start LIVE trading. Without them, LIVE is refused and the public app is PAPER only.
+
 ### Backend on Render or Railway
 
 - Root directory: `backend`
 - Build: `pip install -r requirements.txt`
 - Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-- Env: `DHAN_CLIENT_ID`, `DHAN_ACCESS_TOKEN` (only for LIVE), `CORS_ORIGINS=https://<your-app>.vercel.app`
+- Env: `CORS_ORIGINS=https://<your-app>.vercel.app` (add Dhan credentials only on a private deployment)
 
 The executor lives in process memory, so run one instance. A free instance that sleeps will pause the loop.
 
