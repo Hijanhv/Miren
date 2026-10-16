@@ -83,8 +83,16 @@ export function PriceChart({ analysis, liveRegime }: Props) {
         ctx.fillRect(left, 0, right - left, h);
       }
     };
+    // repaints are batched into one animation frame and skipped once the chart is disposed,
+    // otherwise a frame queued before chart.remove() touches a dead chart
+    let frame = 0;
+    let disposed = false;
     const repaint = (): void => {
-      requestAnimationFrame(paint);
+      if (disposed) return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (!disposed) paint();
+      });
     };
     chart.timeScale().subscribeVisibleLogicalRangeChange(repaint);
     const ro = new ResizeObserver(repaint);
@@ -92,6 +100,8 @@ export function PriceChart({ analysis, liveRegime }: Props) {
     chart.timeScale().fitContent();
 
     return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
       ro.disconnect();
       chart.timeScale().unsubscribeVisibleLogicalRangeChange(repaint);
       chart.remove();
