@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #141414 0%, #1c1c1c 50%, #141414 100%);
+  background-size: 800px 100%;
+  @apply animate-shimmer;
+}
