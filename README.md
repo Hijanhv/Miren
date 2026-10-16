@@ -1,5 +1,7 @@
 # Miren
 
+**The market changes. Miren changes with it.**
+
 Miren is an autonomous market regime detector. It reads daily market data, decides which of four regimes the market is in (trending, mean-reverting, volatile, calm), and runs the strategy built for that regime. When the regime changes, it closes the old strategy's position, switches strategy, and logs what the old strategy earned.
 
 ```
