@@ -150,7 +150,7 @@ PAPER mode needs no credentials. For LIVE:
 
 LIVE places MARKET CNC orders on `NSE_EQ` and polls each order until it trades. A rejected order leaves the position unchanged and shows up in the event log.
 
-To try LIVE without real money, use Dhan's sandbox: create keys at [developer.dhanhq.co](https://developer.dhanhq.co) and set `DHAN_API_BASE_URL=https://sandbox.dhan.co/v2`.
+To try LIVE without real money, use Dhan's sandbox: create keys at [developer.dhanhq.co](https://developer.dhanhq.co) and set `DHAN_API_BASE_URL=https://sandbox.dhan.co/v2`. Then run `cd backend && .venv/bin/python scripts/dhan_sandbox_check.py`. It buys and sells 1 share of RELIANCE through Miren's Dhan client and refuses to run against any URL other than the sandbox.
 
 ## Deployment
 
